@@ -1,3 +1,4 @@
+library(data.table)
 library(tidyr)
 library(dplyr)
 
@@ -27,7 +28,7 @@ test_set <- read.table("UCI HAR Dataset/test/X_test.txt", stringsAsFactors = FAL
 test_labels <- read.table("UCI HAR Dataset/test/y_test.txt", stringsAsFactors = FALSE)
 test_subject <- read.table("UCI HAR Dataset/test/subject_test.txt", stringsAsFactors = FALSE)
 
-# Combine Training data and Test data
+# Combine Training data and Test data into one dataset
 training_data <- bind_cols(training_subject, training_labels, training_set)
 test_data <- bind_cols(test_subject, test_labels, test_set)
 result_data <- bind_rows(training_data, test_data)
@@ -41,4 +42,8 @@ result_data$activity <- activity_labels[match(result_data$activity, activity_lab
 # Create new dataset which calculates mean for all columns
 result_data.means <- result_data %>% group_by(subject, activity) %>% summarise_all(mean)
 
+# Write file for new tidy dataset
+write.table(result_data.means, "tidy_data.txt", row.names = FALSE, quote = FALSE)
+
+# Cleanup unused and temporary data
 rm(test_data, test_labels, test_set, test_subject, training_data, training_labels, training_set, training_subject, activity_labels, features)
